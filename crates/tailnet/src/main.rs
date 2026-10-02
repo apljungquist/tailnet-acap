@@ -68,6 +68,10 @@ fn main() {
 
     nix::sys::stat::umask(Mode::S_IRWXG.union(Mode::S_IRWXO));
 
+    let Ok(()) = rustls_openssl::default_provider().install_default() else {
+        panic!("could not install our preferred crypto provider")
+    };
+
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()
