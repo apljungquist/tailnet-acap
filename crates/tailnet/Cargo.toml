@@ -16,7 +16,7 @@ acap-logging = { workspace = true }
 anyhow = { workspace = true }
 axum = { workspace = true }
 easy-acap-dirs = { workspace = true }
-log = { workspace = true }
+log = { workspace = true, features = ["release_max_level_info"] }
 nix = { workspace = true, features = ["fs", "hostname"] }
 rustls = { workspace = true }
 rustls-openssl = { workspace = true }
@@ -26,10 +26,8 @@ tailscale = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "net", "io-util", "signal", "time"] }
 tokio-util = { workspace = true }
 tower-http = { workspace = true, features = ["fs"] }
-tracing = { workspace = true, features = ["log"] }
+tracing = { workspace = true, features = ["log", "release_max_level_info"] }
 url = { workspace = true }
-
-
 
 [build-dependencies]
 serde_json = { workspace = true }
