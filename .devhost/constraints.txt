@@ -1,0 +1,6 @@
+attrs==26.1.0
+    # via jsonschema
+jsonschema==4.10.3
+    # via -r .devhost/requirements.txt
+pyrsistent==0.20.0
+    # via jsonschema

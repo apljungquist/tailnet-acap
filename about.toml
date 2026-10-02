@@ -1,0 +1,17 @@
+accepted = [
+    "MIT",
+    "Apache-2.0",
+    "BSD-3-Clause",
+    "Unicode-3.0",
+    "Unicode-DFS-2016",
+    "0BSD",
+    "BSD-2-Clause",
+    "CDLA-Permissive-2.0",
+    "ISC",
+    "MPL-2.0",
+    "Zlib",
+]
+ignore-build-dependencies = true
+ignore-dev-dependencies = true
+no-clearly-defined = true
+private = { ignore = true }

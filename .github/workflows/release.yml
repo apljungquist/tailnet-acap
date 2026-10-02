@@ -1,0 +1,122 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    # Keep in sync with `UBUNTU_VERSION` in `.devcontainer/Dockerfile`.
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The version in the package file names comes from the crate, not the
+      # tag, so a mismatch would publish misleadingly named artifacts.
+      - name: Check that the tag matches the crate version
+        run: |
+          version=$(cargo metadata --format-version 1 --no-deps \
+            | jq -r '.packages[] | select(.name == "tailnet") | .version')
+          if [ "$TAG" != "$version" ]; then
+            echo "::error::tag $TAG does not match tailnet version $version"
+            exit 1
+          fi
+      # Create the release up front, but as a draft, so that it never becomes
+      # visible without its artifacts. Reuse an existing draft so that the
+      # workflow can be re-run after a failed build.
+      - name: Create the draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "::notice::release $TAG already exists, reusing it"
+            exit 0
+          fi
+          args=(--draft --verify-tag --title "$TAG")
+          # A tag with a semver pre-release, such as `0.24.0-beta`, must not be
+          # offered to users as a normal release.
+          case "$TAG" in
+            *-*) args+=(--prerelease) ;;
+          esac
+          gh release create "$TAG" "${args[@]}"
+      - name: Configure SDK location
+        run: echo "ACAP_SDK_LOCATION=$HOME/axis" >> "$GITHUB_ENV"
+      - name: Restore SDK
+        id: cache-sdk
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ env.ACAP_SDK_LOCATION }}
+          key: acap-sdk-${{ runner.os }}-${{ hashFiles('.devhost/install-sdk.sh') }}
+      - name: Install SDK from docker
+        if: steps.cache-sdk.outputs.cache-hit != 'true'
+        working-directory: .devhost
+        run: |
+          mkdir -p "$ACAP_SDK_LOCATION"
+          ./install-sdk.sh "$ACAP_SDK_LOCATION"
+          docker system prune --all --force
+      # Saved as its own step, right after what produces it, because `actions/cache` declares
+      # `post-if: success()` and so saves nothing when a later step fails.
+      - name: Save SDK
+        if: steps.cache-sdk.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ env.ACAP_SDK_LOCATION }}
+          key: acap-sdk-${{ runner.os }}-${{ hashFiles('.devhost/install-sdk.sh') }}
+      - name: Global setup
+        working-directory: .devhost
+        run: |
+          sudo ./install-system-packages.sh
+          sudo ln -sfn "$ACAP_SDK_LOCATION" /opt/axis
+          ./install-rust.sh
+      - name: Restore venv
+        id: cache-venv
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: .devhost/venv
+          key: venv-${{ runner.os }}-${{ hashFiles('.devhost/install-venv.sh', '.devhost/requirements.txt', '.devhost/constraints.txt') }}
+      - name: Local setup
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        working-directory: .devhost
+        run: ./install-venv.sh "$PWD/venv"
+      - name: Save venv
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: .devhost/venv
+          key: venv-${{ runner.os }}-${{ hashFiles('.devhost/install-venv.sh', '.devhost/requirements.txt', '.devhost/constraints.txt') }}
+      # Deliberately no `target/` cache: `cargo-acap-build` appends to
+      # `target/acap/`, so a restored cache would leak artifacts built for
+      # earlier versions into this release.
+      - name: Run checks and build the packages
+        run: |
+          source .devhost/venv/bin/activate
+          source .devhost/environment-setup.sh
+          make --always-make check
+      - name: Attach the artifacts to the draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ls -l target/acap/
+          gh release upload "$TAG" target/acap/*.eap --clobber
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          case "$TAG" in
+            *-*) latest=false ;;
+            *) latest=true ;;
+          esac
+          gh release edit "$TAG" --draft=false --latest="$latest"

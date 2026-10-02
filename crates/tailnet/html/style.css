@@ -1,0 +1,21 @@
+:root {
+    color-scheme: light dark;
+}
+
+body {
+    font-family: system-ui;
+    margin: 0 auto;
+    max-width: 38rem;
+}
+
+input:not([type="checkbox"]) {
+    display: block;
+    width: 100%;
+}
+
+dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 1rem;
+    margin: 0;
+}

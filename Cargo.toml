@@ -1,0 +1,54 @@
+[workspace]
+members = [
+    "crates/*",
+]
+resolver = "3"
+
+[workspace.dependencies]
+acap-logging = "0.1"
+anyhow = "1.0"
+axum = "0.8"
+easy-acap-dirs = { git = "https://github.com/apljungquist/easy-acap.git", rev = "fe18408e350d442c74cd9f92578cb64c102f5769" }
+env_logger = { version = "0.11", default-features = false, features = ["auto-color"] }
+libsyslog = "0.1"
+log = "0.4"
+nix = { version = "0.31", default-features = false }
+serde = "1.0"
+serde_json = "1.0"
+tailscale = "0.6.1"
+tokio = "1"
+tokio-util = { version = "0.7", default-features = false }
+tower-http = "0.6"
+tracing = "0.1"
+url = { version = "2", features = ["serde"] }
+
+[patch.crates-io]
+acap-logging = { git = "https://github.com/apljungquist/acap-rs.git", rev = "3748cf7af3f3ea757cc8d3ff60ff11d0cefdf62c" }
+
+[workspace.package]
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/apljungquist/tailnet-acap"
+
+[workspace.lints.clippy]
+allow_attributes = "warn"
+allow_attributes_without_reason = "warn"
+as_conversions = "warn"
+clone_on_ref_ptr = "warn"
+expect_used = "warn"
+indexing_slicing = "warn"
+mod_module_files = "warn"
+non_ascii_literal = "warn"
+unnecessary_safety_doc = "warn"
+unwrap_used = "warn"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[profile.app]
+inherits = "release"
+opt-level = "s"
+strip = "symbols"
+lto = true
+panic = "abort"
+codegen-units = 1

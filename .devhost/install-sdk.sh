@@ -1,0 +1,31 @@
+#!/usr/bin/env sh
+# Extract the ACAP Native SDK from the images it is distributed in to the given `DIRECTORY`.
+set -eux
+
+DIRECTORY="${1}"
+
+# Keep the SDK and Ubuntu versions in sync with `Dockerfile`.
+docker run axisecp/acap-native-sdk:12.11.0-armv7hf-ubuntu24.04 tar \
+  --create \
+  --directory /opt/ \
+  --file - \
+  --mode ugo+rwX \
+  axis \
+| tar \
+  --directory "${DIRECTORY}" \
+  --extract \
+  --file - \
+  --strip-components 1
+
+# Keep the SDK and Ubuntu versions in sync with `Dockerfile`.
+docker run axisecp/acap-native-sdk:12.11.0-aarch64-ubuntu24.04 tar \
+  --create \
+  --directory /opt/ \
+  --file - \
+  --mode ugo+rwX \
+  axis \
+| tar \
+  --directory "${DIRECTORY}" \
+  --extract \
+  --file - \
+  --strip-components 1

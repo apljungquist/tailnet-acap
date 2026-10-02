@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tailnet</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<section aria-labelledby="status-heading">
+    <h2 id="status-heading">Status</h2>
+    <dl>
+        <dt>State</dt>
+        <dd id="state">-</dd>
+        <dt >Approve at</dt>
+        <dd id="approval"></dd>
+        <dt>Machine name</dt>
+        <dd id="machine-name">-</dd>
+        <dt>Tailscale IPv4</dt>
+        <dd id="tailscale-ipv4">-</dd>
+        <dt>Tailscale IPv6</dt>
+        <dd id="tailscale-ipv6">-</dd>
+        <dt>Full domain</dt>
+        <dd id="full-domain">-</dd>
+        <dt>Tags</dt>
+        <dd id="tags">-</dd>
+        <dt>Last checked</dt>
+        <dd id="last-checked">-</dd>
+    </dl>
+</section>
+
+<form id="preferences-form">
+    <h2>Preferences</h2>
+    <details>
+        <summary>Advanced</summary>
+        <p>
+            <label for="requested-hostname">Requested hostname</label>
+            <input
+                    disabled
+                    id="requested-hostname"
+                    name="requested_hostname"
+                    required
+                    type="text"
+            >
+        </p>
+
+        <p>
+            <label for="requested-tags">Requested tags</label>
+            <input
+                    disabled
+                    id="requested-tags"
+                    name="requested_tags"
+                    type="text"
+            >
+        </p>
+
+        <p>
+            <label for="ephemeral">Ephemeral</label>
+            <input
+                    disabled
+                    id="ephemeral"
+                    name="ephemeral"
+                    type="checkbox"
+            >
+        </p>
+
+        <p>
+            <label for="control-server-url">Control server</label>
+            <input
+                    disabled
+                    id="control-server-url"
+                    name="control_server_url"
+                    required
+                    type="url"
+            >
+        </p>
+    </details>
+
+    <p>
+        <label for="auth-key">Auth key</label>
+        <input
+                autocomplete="new-password"
+                disabled
+                id="auth-key"
+                name="auth_key"
+                pattern="tskey-auth-.+"
+                placeholder="tskey-auth-..."
+                title="An auth key starts with tskey-auth-"
+                type="password"
+        >
+        <small>
+            Use a pre-authentication key to authenticate the device.
+        </small>
+    </p>
+
+    <p>
+        <button disabled>Reconnect</button>
+        <output id="preferences-message">Fetching default values...</output>
+    </p>
+</form>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+    "name": "tailnet-acap",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:2": {}
+    },
+    "remoteUser": "${localEnv:USER}",
+    "runArgs": ["--network=host"]
+}
