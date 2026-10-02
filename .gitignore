@@ -3,6 +3,4 @@
 /init_env.sh
 /localdata/
 /target/
-/target-container/
-/target-*/
 .DS_Store

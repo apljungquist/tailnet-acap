@@ -12,9 +12,9 @@ docker build \
   --file "${REPO_ROOT}/.devcontainer/Dockerfile" \
   "${REPO_ROOT}"
 
-docker run --rm --volume tailnet-acap-target:/target "${TAG}" chmod 0777 /target
+docker run --rm --volume tailnet-acap-target:"${WORKSPACE}/target" "${TAG}" chmod 0777 "${WORKSPACE}/target"
 
-mkdir -p "${REPO_ROOT}/target-container/acap"
+mkdir -p "${REPO_ROOT}/target/acap"
 
 docker run \
   --rm \
@@ -22,8 +22,8 @@ docker run \
   --volume "${REPO_ROOT}:${WORKSPACE}" \
   --volume tailnet-acap-cargo-registry:/usr/local/cargo/registry \
   --volume tailnet-acap-cargo-git:/usr/local/cargo/git \
-  --volume tailnet-acap-target:/target \
-  --volume "${REPO_ROOT}/target-container:${WORKSPACE}/target" \
+  --volume tailnet-acap-target:"${WORKSPACE}/target" \
+  --volume "${REPO_ROOT}/target/acap:${WORKSPACE}/target/acap" \
   --workdir "${WORKSPACE}" \
   --env AXIS_DEVICE_ARCH \
   --env AXIS_DEVICE_HTTP_PORT \
