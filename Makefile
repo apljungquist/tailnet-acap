@@ -47,7 +47,7 @@ build: crates/$(AXIS_PACKAGE)/LICENSE
 		--profile app
 
 ## Install <AXIS_PACKAGE> on <AXIS_DEVICE_IP> using password <AXIS_DEVICE_PASS> and assuming architecture <AXIS_DEVICE_ARCH>
-install:
+install: crates/$(AXIS_PACKAGE)/LICENSE
 	cargo-acap-sdk install \
 	-- \
 	--package $(AXIS_PACKAGE) \
