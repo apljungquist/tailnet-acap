@@ -1,14 +1,17 @@
 name: CI
 
 on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
-    branches: [ main, pre-main ]
+    branches: [ main ]
 
 permissions:
   contents: read
 
 jobs:
   check:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     # Keep in sync with `UBUNTU_VERSION` in `.devcontainer/Dockerfile`.
     runs-on: ubuntu-24.04
     steps:
@@ -22,8 +25,7 @@ jobs:
           ./install-rust.sh
 
       - name: Restore cargo build artifacts
-        id: cache-cargo
-        if: github.ref_name == 'pre-main'
+        if: github.event_name == 'pull_request'
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
@@ -44,7 +46,7 @@ jobs:
             check_tests
 
       - name: Save cargo build artifacts
-        if: steps.cache-cargo.outputs.cache-hit != 'true'
+        if: github.event_name == 'push'
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
@@ -55,6 +57,7 @@ jobs:
           key: cargo-check-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml') }}-${{ hashFiles('**/Cargo.lock') }}
 
   build:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     # Keep in sync with `UBUNTU_VERSION` in `.devcontainer/Dockerfile`.
     runs-on: ubuntu-24.04
     steps:
@@ -113,8 +116,7 @@ jobs:
           key: venv-${{ runner.os }}-${{ hashFiles('.devhost/install-venv.sh', '.devhost/requirements.txt', '.devhost/constraints.txt') }}
 
       - name: Restore cargo build artifacts
-        id: cache-cargo
-        if: github.ref_name == 'pre-main'
+        if: github.event_name == 'pull_request'
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
@@ -136,7 +138,7 @@ jobs:
             check_lint_target
 
       - name: Save cargo build artifacts
-        if: steps.cache-cargo.outputs.cache-hit != 'true'
+        if: github.event_name == 'push'
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
