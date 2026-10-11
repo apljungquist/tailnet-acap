@@ -1,8 +1,8 @@
 ARG REPO=axisecp
 ARG SDK=acap-native-sdk
-# Keep in sync with `install-sdk.sh` and `runs-on` in `main.yml` and `release.yml`.
+# Keep in sync with `runs-on` in `main.yml` and `release.yml`.
 ARG UBUNTU_VERSION=24.04
-# Keep in sync with `install-sdk.sh`.
+# Keep in sync with the SDK that the nix4a revision in `main.yml` and `release.yml` resolves to.
 ARG VERSION=12.11.0
 ARG BASE_IMAGE=debian:trixie-20260223
 
