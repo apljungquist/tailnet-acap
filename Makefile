@@ -43,6 +43,8 @@ build: crates/$(AXIS_PACKAGE)/LICENSE
 	RUSTC_BOOTSTRAP=1 \
 	CARGO_UNSTABLE_BUILD_STD=std,panic_abort \
 	CARGO_UNSTABLE_BUILD_STD_FEATURES=optimize_for_size \
+	CARGO_UNSTABLE_PANIC_IMMEDIATE_ABORT=true \
+	CARGO_PROFILE_APP_PANIC=immediate-abort \
 	cargo-acap-build \
 		--arch $(AXIS_DEVICE_ARCH) \
 		-- \
