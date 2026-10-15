@@ -49,7 +49,7 @@ unsafe_code = "forbid"
 
 [profile.app]
 inherits = "release"
-opt-level = "s"
+opt-level = "z"
 strip = "symbols"
 lto = true
 panic = "abort"
